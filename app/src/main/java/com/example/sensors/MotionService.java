@@ -18,6 +18,11 @@ import android.os.HandlerThread;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 
+//For notifications
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
+
 public class MotionService extends Service{
 
     //Declare variables
@@ -32,6 +37,9 @@ public class MotionService extends Service{
     private float lastX, lastY, lastZ;
     private boolean firstReading = true;
     private static final float MOVEMENT_THRESHOLD = 3.0f;
+
+    // For Notification
+    private static final String CHANNEL_ID = "motion_channel";
 
     // Allow app to receive updates when sensor's values change
     private SensorEventListener sensorListener = new SensorEventListener() {
@@ -90,6 +98,9 @@ public class MotionService extends Service{
         //Create handler connected to the new thread
         sensorHandler = new Handler(sensorThread.getLooper());
 
+        // Call NotificationChannel Method
+        createNotificationChannel();
+
         Log.d("MotionService", "Service created");
     }
 
@@ -114,4 +125,22 @@ public class MotionService extends Service{
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    private void createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Motion Alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+
+            NotificationManager manager =
+                    getSystemService(NotificationManager.class);
+
+            manager.createNotificationChannel(channel);
+        }
+    }
+
 }
