@@ -11,6 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Sensors">
+
+        <service android:name=".MotionService"
+            android:exported="false"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
