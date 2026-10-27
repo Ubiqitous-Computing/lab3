@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     Button startButton;
+    Button stopButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         startButton = findViewById(R.id.startButton);
+        stopButton = findViewById(R.id.stopButton);
+
+        //Listener for StopButton
+        stopButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MotionService.class);
+            stopService(intent);
+        });
 
         // Listener for StartButton
         startButton.setOnClickListener(v -> {

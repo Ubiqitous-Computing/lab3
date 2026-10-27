@@ -203,4 +203,19 @@ public class MotionService extends Service{
         // Display notification
         manager.notify(1, notification);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Stop receiving accelerometer readings
+        sensorManager.unregisterListener(sensorListener);
+
+        // Stop the separate thread
+        if (sensorThread != null) {
+            sensorThread.quitSafely();
+        }
+
+        Log.d("MotionService", "Service destroyed");
+    }
 }
