@@ -23,6 +23,16 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+//Display Motion notification
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import android.util.Log;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class MotionService extends Service{
 
     //Declare variables
@@ -72,6 +82,8 @@ public class MotionService extends Service{
 
             if (movement > MOVEMENT_THRESHOLD) {
                 Log.d("MotionService", "MOVEMENT DETECTED");
+
+                showMotionNotification();
             }
             lastX = x;
             lastY = y;
@@ -143,4 +155,33 @@ public class MotionService extends Service{
         }
     }
 
+    private void showMotionNotification() {
+
+        // Get the current time
+        String time = new SimpleDateFormat(
+                "HH:mm:ss", Locale.getDefault()
+        ).format(new Date());
+
+        // Create the notification
+        Notification notification = new Notification.Builder(this, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("Motion Detected!")
+                .setContentText("Phone moved at " + time)
+                .setAutoCancel(true)
+                .build();
+
+        // Get the notification manager
+        NotificationManager manager =
+                getSystemService(NotificationManager.class);
+
+        // Check notification permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // Display notification
+        manager.notify(1, notification);
+    }
 }
