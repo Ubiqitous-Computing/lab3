@@ -10,11 +10,19 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.content.Context;
 
+// Threads handled on separate thread
+import android.os.Handler;
+import android.os.HandlerThread;
+
 public class MotionService extends Service{
 
     //Declare variables
     private SensorManager sensorManager;
     private Sensor accelerometer;
+
+    // Threads
+    private HandlerThread sensorThread;
+    private Handler sensorHandler;
 
     @Override
     public void onCreate() {
@@ -25,7 +33,15 @@ public class MotionService extends Service{
 
         accelerometer = sensorManager.getDefaultSensor(
                 Sensor.TYPE_ACCELEROMETER);
-        )
+
+        // Create separate threads
+        sensorThread = new HandlerThread("SensorThread");
+
+        // Start thread to process tasks
+        sensorThread.start();
+
+        //Create handler connected to the new thread
+        sensorHandler = new Handler(sensorThread.getLooper());
 
         Log.d("MotionService", "Service created");
     }
