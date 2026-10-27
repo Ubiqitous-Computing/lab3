@@ -28,6 +28,11 @@ public class MotionService extends Service{
     private HandlerThread sensorThread;
     private Handler sensorHandler;
 
+    //For readings
+    private float lastX, lastY, lastZ;
+    private boolean firstReading = true;
+    private static final float MOVEMENT_THRESHOLD = 3.0f;
+
     // Allow app to receive updates when sensor's values change
     private SensorEventListener sensorListener = new SensorEventListener() {
 
@@ -39,8 +44,30 @@ public class MotionService extends Service{
             float y = event.values[1];
             float z = event.values[2];
 
-            Log.d("MotionService",
-                    "X: " + x + " Y: " + y + " Z: " + z);
+            if (firstReading) {
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+
+                firstReading = false;
+                return;
+            }
+            float deltaX = x - lastX;
+            float deltaY = y - lastY;
+            float deltaZ = z - lastZ;
+
+            float movement = (float) Math.sqrt(
+                    deltaX * deltaX +
+                            deltaY * deltaY +
+                            deltaZ * deltaZ
+            );
+
+            if (movement > MOVEMENT_THRESHOLD) {
+                Log.d("MotionService", "MOVEMENT DETECTED");
+            }
+            lastX = x;
+            lastY = y;
+            lastZ = z;
         }
     };
 
@@ -69,6 +96,15 @@ public class MotionService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
 
+        //Tell SensorManager to send readings
+        if (accelerometer != null) {
+            sensorManager.registerListener(
+                    sensorListener,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_NORMAL,
+                    sensorHandler
+            );
+        }
         Log.d("MotionService", "Service started");
 
         return START_STICKY;
