@@ -51,6 +51,10 @@ public class MotionService extends Service{
     // For Notification
     private static final String CHANNEL_ID = "motion_channel";
 
+    // Cooldown detection for accelerometer
+    private long lastNotificationTime = 0;
+    private static final long COOLDOWN = 5000;
+
     // Allow app to receive updates when sensor's values change
     private SensorEventListener sensorListener = new SensorEventListener() {
 
@@ -80,11 +84,19 @@ public class MotionService extends Service{
                             deltaZ * deltaZ
             );
 
-            if (movement > MOVEMENT_THRESHOLD) {
-                Log.d("MotionService", "MOVEMENT DETECTED");
+
+            long currentTime = System.currentTimeMillis();
+
+            if (movement > MOVEMENT_THRESHOLD &&
+                    currentTime - lastNotificationTime >= COOLDOWN) {
+
+                Log.d("MotionService", "MOVEMENT DETECTED!");
 
                 showMotionNotification();
+
+                lastNotificationTime = currentTime;
             }
+
             lastX = x;
             lastY = y;
             lastZ = z;
