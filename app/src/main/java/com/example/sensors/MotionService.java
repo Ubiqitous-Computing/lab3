@@ -14,6 +14,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+// Listens to accelerometer
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+
 public class MotionService extends Service{
 
     //Declare variables
@@ -23,6 +27,22 @@ public class MotionService extends Service{
     // Threads
     private HandlerThread sensorThread;
     private Handler sensorHandler;
+
+    // Allow app to receive updates when sensor's values change
+    private SensorEventListener sensorListener = new SensorEventListener() {
+
+        //Whenever new sensor reading is delivered, call this
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            Log.d("MotionService",
+                    "X: " + x + " Y: " + y + " Z: " + z);
+        }
+    };
 
     @Override
     public void onCreate() {
