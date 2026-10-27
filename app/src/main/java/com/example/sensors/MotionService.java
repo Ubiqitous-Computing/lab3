@@ -89,6 +89,9 @@ public class MotionService extends Service{
             lastY = y;
             lastZ = z;
         }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
     };
 
     @Override
@@ -162,11 +165,27 @@ public class MotionService extends Service{
                 "HH:mm:ss", Locale.getDefault()
         ).format(new Date());
 
-        // Create the notification
+        //Create Intent for details screen
+        Intent intent = new Intent(this, MotionDetailsActivity.class);
+
+        // Pass movement time
+        intent.putExtra("motion_time", time);
+
+        // Create PendingIntent
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT |
+                        PendingIntent.FLAG_IMMUTABLE
+        );
+
+        // Build the notification
         Notification notification = new Notification.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setContentTitle("Motion Detected!")
                 .setContentText("Phone moved at " + time)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build();
 
